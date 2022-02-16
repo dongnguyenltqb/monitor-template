@@ -2,8 +2,8 @@ version: "3.9"
 services:
   grafana:
     image: grafana/grafana-oss:8.2.6-ubuntu
-    ports:
-      - 1212:3000
+    # ports:
+    #   - 34563:3000
     networks:
       - monitor
     restart: always
@@ -24,6 +24,8 @@ services:
     networks:
       - monitor
     restart: always
+    ports:
+      - 34567:9090
     depends_on:
       - node_exporter
   alertmanagers:
