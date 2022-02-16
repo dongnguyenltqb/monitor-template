@@ -3,12 +3,16 @@ services:
   grafana:
     image: grafana/grafana-oss:8.2.6-ubuntu
     ports:
-      - 1264:3000
+      - 1212:3000
     networks:
       - monitor
     restart: always
     volumes:
       - monitor_grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana.ini:/etc/grafana/grafana.ini
+    environment:
+      - GF_PATHS_CONFIG:/etc/grafana/grafana.ini
     depends_on:
       - prometheus
   prometheus:
@@ -21,7 +25,7 @@ services:
       - monitor
     restart: always
     depends_on:
-      - alertmanagers
+      - node_exporter
   alertmanagers:
     image: prom/alertmanager
     volumes:
@@ -29,6 +33,8 @@ services:
     networks:
       - monitor
     restart: always
+    depends_on:
+      - prometheus
   node_exporter:
     image: prom/node-exporter
     networks:
