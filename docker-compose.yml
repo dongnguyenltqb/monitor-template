@@ -1,54 +1,54 @@
 version: "3.9"
+
+networks:
+  prometheus:
+    driver: bridge
+
+volumes:
+  prometheus-data: {}
+  grafana-data: {}
+
 services:
   grafana:
-    image: grafana/grafana-oss:8.2.6-ubuntu
-    # ports:
-    #   - 34563:3000
+    image: grafana/grafana-oss
+    ports:
+      - 3000:3000
     networks:
-      - monitor
+      - prometheus
     restart: always
     volumes:
-      - monitor_grafana:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
       - ./grafana.ini:/etc/grafana/grafana.ini
     environment:
       - GF_PATHS_CONFIG:/etc/grafana/grafana.ini
-    depends_on:
-      - prometheus
+
   prometheus:
     image: prom/prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./alert.rules:/etc/prometheus/alert.rules
-      - monitor_prometheus:/prometheus
+      - prometheus-data:/prometheus
     networks:
-      - monitor
+      - prometheus
     restart: always
     ports:
-      - 34567:9090
-    depends_on:
-      - node_exporter
+      - 9090:9090
+
   alertmanagers:
     image: prom/alertmanager
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
     networks:
-      - monitor
-    restart: always
-    depends_on:
       - prometheus
+    restart: always
+
   node_exporter:
     image: prom/node-exporter
     networks:
-      - monitor
+      - prometheus
     restart: always
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-networks:
-  monitor:
-    driver: bridge
-volumes:
-  monitor_prometheus: {}
-  monitor_grafana: {}
