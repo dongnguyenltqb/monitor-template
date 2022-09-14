@@ -1,7 +1,0 @@
-apiVersion: 1
-
-providers:
-  - name: 'Default'
-    folder: 'Service'
-    options:
-      path: /etc/grafana/provisioning/dashboards
